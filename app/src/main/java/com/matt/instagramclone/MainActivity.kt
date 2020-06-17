@@ -4,33 +4,39 @@ import android.os.Bundle
 import android.widget.TextView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import com.matt.instagramclone.Fragments.HomeFragment
+import com.matt.instagramclone.Fragments.NotificationsFragment
+import com.matt.instagramclone.Fragments.ProfileFragment
+import com.matt.instagramclone.Fragments.SearchFragment
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var textMessage: TextView
+    internal  var selectedFragment: Fragment ?= null
 
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.nav_home -> {
-                textMessage.setText("Home")
-                return@OnNavigationItemSelectedListener true
+                selectedFragment = HomeFragment()
             }
             R.id.nav_search -> {
-                textMessage.setText("Search")
-                return@OnNavigationItemSelectedListener true
+                selectedFragment = SearchFragment()
             }
             R.id.nav_add_post -> {
-                textMessage.setText("Add Post")
                 return@OnNavigationItemSelectedListener true
             }
             R.id.nav_notifications -> {
-                textMessage.setText("Notifications")
-                return@OnNavigationItemSelectedListener true
+                selectedFragment = NotificationsFragment()
             }
             R.id.nav_profile -> {
-                textMessage.setText("Profile")
-                return@OnNavigationItemSelectedListener true
-            }
+                selectedFragment = ProfileFragment()            }
+        }
+
+        if (selectedFragment != null) {
+            supportFragmentManager.beginTransaction().replace(
+                R.id.fragment_container,
+                selectedFragment!!
+            ).commit()
         }
 
         false
@@ -43,10 +49,7 @@ class MainActivity : AppCompatActivity() {
 
         val navView: BottomNavigationView = findViewById(R.id.nav_view)
 
-        textMessage = findViewById(R.id.message)
-
         navView.setOnNavigationItemSelectedListener (onNavigationItemSelectedListener)
-
 
     }
 }
