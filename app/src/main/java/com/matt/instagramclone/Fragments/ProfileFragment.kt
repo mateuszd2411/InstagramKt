@@ -49,6 +49,9 @@ class ProfileFragment : Fragment() {
         view.edit_account_settings_btn.setOnClickListener {
             startActivity(Intent(context, AccountSettingsActivity::class.java))}
 
+        getFollowers()
+        getFollowing()
+
         return view
     }
 
@@ -77,6 +80,48 @@ class ProfileFragment : Fragment() {
             })
         }
 
+    }
+
+    private fun getFollowers() {
+        val followersRef = firebaseUser?.uid.let { it1 ->
+            FirebaseDatabase.getInstance().reference
+                .child("FollowKt").child(it1.toString())
+                .child("Followers")
+        }
+
+        followersRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(p0: DataSnapshot) {
+                if (p0.exists()) {
+                    view?.total_followers?.text = p0.childrenCount.toString()
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+        })
+    }
+
+    private fun getFollowing() {
+        val followersRef = firebaseUser?.uid.let { it1 ->
+            FirebaseDatabase.getInstance().reference
+                .child("FollowKt").child(it1.toString())
+                .child("Following")
+        }
+
+        followersRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(p0: DataSnapshot) {
+                if (p0.exists()) {
+                    view?.total_following?.text = p0.childrenCount.toString()
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+        })
     }
 
 
