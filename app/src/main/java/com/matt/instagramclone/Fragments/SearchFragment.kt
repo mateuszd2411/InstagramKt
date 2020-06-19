@@ -47,11 +47,7 @@ class SearchFragment : Fragment() {
         view.search_edit_text.addTextChangedListener(object : TextWatcher {
 
             override fun beforeTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
 
-            override fun afterTextChanged(s: Editable?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }
 
             override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -65,6 +61,11 @@ class SearchFragment : Fragment() {
                 }
             }
 
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+
+
         }
         )
 
@@ -72,7 +73,35 @@ class SearchFragment : Fragment() {
     }
 
     private fun searchUser(input: String) {
+        val query = FirebaseDatabase.getInstance().getReference()
+            .child("UsersKt")
+            .orderByChild("fullname")
+            .startAt(input)
+            .endAt(input + "\uf8ff")
 
+        query.addValueEventListener(object : ValueEventListener {
+
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+
+                mUser?.clear()
+
+                for (snapshot in dataSnapshot.children) {
+                    val user = snapshot.getValue(User::class.java)
+                    if (user != null) {
+
+                        mUser?.add(user)
+
+                    }
+                }
+
+                userAdapter?.notifyDataSetChanged()
+
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+        })
     }
 
     private fun retrieveUsers() {
