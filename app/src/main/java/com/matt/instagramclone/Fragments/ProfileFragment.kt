@@ -36,6 +36,7 @@ class ProfileFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
         firebaseUser = FirebaseAuth.getInstance().currentUser!!
+
         val pref = context?.getSharedPreferences("PREFS", Context.MODE_PRIVATE)
         if (pref != null) {
             this.profileId = pref.getString("profileId", "none")!!
@@ -44,7 +45,7 @@ class ProfileFragment : Fragment() {
         if (profileId == firebaseUser.uid) {
             view.edit_account_settings_btn.text = "Edit Profile"
         }
-        else if (profileId == firebaseUser.uid) {
+        else if (profileId != firebaseUser.uid) {
             checkFollowAndFollowingButtonStatus()
         }
 
@@ -52,7 +53,7 @@ class ProfileFragment : Fragment() {
             startActivity(Intent(context, AccountSettingsActivity::class.java))}
 
         getFollowers()
-        getFollowing()
+        getFollowings()
         userInfo()
 
         return view
@@ -86,11 +87,10 @@ class ProfileFragment : Fragment() {
     }
 
     private fun getFollowers() {
-        val followersRef = firebaseUser?.uid.let { it1 ->
-            FirebaseDatabase.getInstance().reference
-                .child("FollowKt").child(it1.toString())
+        val followersRef = FirebaseDatabase.getInstance().reference
+                .child("FollowKt").child(profileId)
                 .child("Followers")
-        }
+
 
         followersRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
@@ -106,12 +106,10 @@ class ProfileFragment : Fragment() {
         })
     }
 
-    private fun getFollowing() {
-        val followersRef = firebaseUser?.uid.let { it1 ->
-            FirebaseDatabase.getInstance().reference
-                .child("FollowKt").child(it1.toString())
+    private fun getFollowings() {
+        val followersRef = FirebaseDatabase.getInstance().reference
+                .child("FollowKt").child(profileId)
                 .child("Following")
-        }
 
         followersRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
@@ -134,9 +132,9 @@ class ProfileFragment : Fragment() {
         usersRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
 
-                if (context != null) {
-                    return
-                }
+//                if (context != null) {
+//                    return
+//                }
 
                 if (p0.exists()) {
                     val user = p0.getValue<User>(User::class.java)
@@ -155,6 +153,30 @@ class ProfileFragment : Fragment() {
             }
 
         })
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        val pref = context?.getSharedPreferences("PREFS", Context.MODE_PRIVATE)?.edit()
+        pref?.putString("profileId", firebaseUser.uid)
+        pref?.apply()
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        val pref = context?.getSharedPreferences("PREFS", Context.MODE_PRIVATE)?.edit()
+        pref?.putString("profileId", firebaseUser.uid)
+        pref?.apply()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        val pref = context?.getSharedPreferences("PREFS", Context.MODE_PRIVATE)?.edit()
+        pref?.putString("profileId", firebaseUser.uid)
+        pref?.apply()
     }
 
 }
