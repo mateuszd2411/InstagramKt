@@ -177,12 +177,8 @@ class ProfileFragment : Fragment() {
             FirebaseDatabase.getInstance().getReference().child("UsersKt").child(profileId)
 
         usersRef.addValueEventListener(object : ValueEventListener {
+
             override fun onDataChange(p0: DataSnapshot) {
-
-//                if (context != null) {
-//                    return
-//                }
-
                 if (p0.exists()) {
                     val user = p0.getValue<User>(User::class.java)
 
