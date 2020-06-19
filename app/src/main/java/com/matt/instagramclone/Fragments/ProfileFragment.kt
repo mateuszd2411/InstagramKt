@@ -15,8 +15,10 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.matt.instagramclone.AccountSettingsActivity
+import com.matt.instagramclone.Models.User
 
 import com.matt.instagramclone.R
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_profile.view.*
 
 /**
@@ -42,7 +44,7 @@ class ProfileFragment : Fragment() {
         if (profileId == firebaseUser.uid) {
             view.edit_account_settings_btn.text = "Edit Profile"
         }
-        else if (profileId != firebaseUser.uid) {
+        else if (profileId == firebaseUser.uid) {
             checkFollowAndFollowingButtonStatus()
         }
 
@@ -51,6 +53,7 @@ class ProfileFragment : Fragment() {
 
         getFollowers()
         getFollowing()
+        userInfo()
 
         return view
     }
@@ -124,5 +127,34 @@ class ProfileFragment : Fragment() {
         })
     }
 
+    private fun userInfo() {
+        val usersRef =
+            FirebaseDatabase.getInstance().getReference().child("UsersKt").child(profileId)
+
+        usersRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(p0: DataSnapshot) {
+
+                if (context != null) {
+                    return
+                }
+
+                if (p0.exists()) {
+                    val user = p0.getValue<User>(User::class.java)
+
+                    Picasso.get().load(user!!.getImage()).placeholder(R.drawable.profile)
+                        .into(view?.pro_image_profile_frag)
+                    view?.profile_fragment_username?.text = user!!.getUsername()
+                    view?.full_name_profile_frag?.text = user!!.getFullname()
+                    view?.bio_profile_frag?.text = user!!.getBio()
+                }
+
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+        })
+    }
 
 }
