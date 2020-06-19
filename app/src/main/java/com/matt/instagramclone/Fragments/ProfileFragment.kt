@@ -43,7 +43,7 @@ class ProfileFragment : Fragment() {
             view.edit_account_settings_btn.text = "Edit Profile"
         }
         else if (profileId != firebaseUser.uid) {
-            checkFollowAndFollowing()
+            checkFollowAndFollowingButtonStatus()
         }
 
         view.edit_account_settings_btn.setOnClickListener {
@@ -52,7 +52,7 @@ class ProfileFragment : Fragment() {
         return view
     }
 
-    private fun checkFollowAndFollowing() {
+    private fun checkFollowAndFollowingButtonStatus() {
 
         val followingRef = firebaseUser?.uid.let { it1 ->
             FirebaseDatabase.getInstance().reference
