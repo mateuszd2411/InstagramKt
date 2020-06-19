@@ -50,7 +50,54 @@ class ProfileFragment : Fragment() {
         }
 
         view.edit_account_settings_btn.setOnClickListener {
-            startActivity(Intent(context, AccountSettingsActivity::class.java))}
+
+            val getButtonText = view.edit_account_settings_btn.text.toString()
+
+            when {
+                getButtonText == "Edit Profile" -> startActivity(
+                    Intent(
+                        context,
+                        AccountSettingsActivity::class.java
+                    )
+                )
+
+                getButtonText == "Follow" -> {
+                    firebaseUser?.uid.let { it1 ->
+                        FirebaseDatabase.getInstance().reference
+                            .child("FollowKt").child(it1.toString())
+                            .child("Following").child(profileId)
+                            .setValue(true)
+                    }
+
+                    firebaseUser?.uid.let { it1 ->
+                        FirebaseDatabase.getInstance().reference
+                            .child("FollowKt").child(profileId)
+                            .child("Followers").child(it1.toString())
+                            .setValue(true)
+                    }
+                }
+
+                getButtonText == "Following" ->{
+                    firebaseUser?.uid.let { it1 ->
+                        FirebaseDatabase.getInstance().reference
+                            .child("FollowKt").child(it1.toString())
+                            .child("Following").child(profileId)
+                            .removeValue()
+                    }
+
+                    firebaseUser?.uid.let { it1 ->
+                        FirebaseDatabase.getInstance().reference
+                            .child("FollowKt").child(profileId)
+                            .child("Followers").child(it1.toString())
+                            .removeValue()
+                    }
+                }
+            }
+
+
+
+
+        }
 
         getFollowers()
         getFollowings()
