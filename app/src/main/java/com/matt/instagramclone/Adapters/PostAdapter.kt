@@ -46,8 +46,16 @@ class PostAdapter
 
         Picasso.get().load(post.getPostimage()).into(holder.postImage)
 
+        if (post.getDescription().equals("")) {
+            holder.description.visibility == View.GONE
+        } else {
+            holder.description.visibility == View.VISIBLE
+            holder.description.setText(post.getDescription())
+        }
+
         publisherInfo(holder.profileImage, holder.userName, holder.publisher, post.getPublisher())
         isLikes(post.getPostid(), holder.likeButton)
+        numberOfLikes(holder.likes, post.getPostid())
 
         holder.likeButton.setOnClickListener {
             if (holder.likeButton.tag == "Like") {
@@ -68,6 +76,26 @@ class PostAdapter
 
             }
         }
+    }
+
+    private fun numberOfLikes(likes: TextView, postid: String) {
+        val LikesRef = FirebaseDatabase.getInstance().reference
+            .child("LikesKt").child(postid)
+
+        LikesRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(p0: DataSnapshot) {
+                if (p0.exists()) {
+                    likes.text = p0.childrenCount.toString() + " likes"
+                } else {
+
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+        })
     }
 
     private fun isLikes(postid: String, likeButton: ImageView) {
