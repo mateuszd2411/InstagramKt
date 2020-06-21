@@ -80,8 +80,9 @@ class PostAdapter
 
         holder.commentButton.setOnClickListener {
             val intentComment = Intent(mContext, CommentActivity::class.java)
+            intentComment.putExtra("postId", post.getPostid())
+            intentComment.putExtra("publisherId", post.getPublisher())
             mContext.startActivity(intentComment)
-
         }
     }
 
