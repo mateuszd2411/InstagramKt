@@ -15,6 +15,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.matt.instagramclone.CommentActivity
 import com.matt.instagramclone.MainActivity
 import com.matt.instagramclone.Models.Post
 import com.matt.instagramclone.Models.User
@@ -47,9 +48,9 @@ class PostAdapter
         Picasso.get().load(post.getPostimage()).into(holder.postImage)
 
         if (post.getDescription().equals("")) {
-            holder.description.visibility == View.GONE
+            holder.description.visibility = View.GONE
         } else {
-            holder.description.visibility == View.VISIBLE
+            holder.description.visibility = View.VISIBLE
             holder.description.setText(post.getDescription())
         }
 
@@ -75,6 +76,12 @@ class PostAdapter
                 mContext.startActivity(intent)
 
             }
+        }
+
+        holder.commentButton.setOnClickListener {
+            val intentComment = Intent(mContext, CommentActivity::class.java)
+            mContext.startActivity(intentComment)
+
         }
     }
 
