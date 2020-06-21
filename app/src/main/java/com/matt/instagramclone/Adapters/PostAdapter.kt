@@ -52,6 +52,7 @@ class PostAdapter
         var profileImage: CircleImageView
         var postImage: ImageView
         var commentButton: ImageView
+        var likeButton: ImageView
         var saveButton: ImageView
         var userName: TextView
         var likes: TextView
@@ -62,13 +63,14 @@ class PostAdapter
         init {
             profileImage = itemView.findViewById(R.id.user_profile_image_post)
             postImage = itemView.findViewById(R.id.post_image_home)
+            likeButton = itemView.findViewById(R.id.post_image_like_btn)
             commentButton = itemView.findViewById(R.id.post_image_comment_btn)
             saveButton = itemView.findViewById(R.id.post_save_comment_btn)
             userName = itemView.findViewById(R.id.user_name_posts)
             likes = itemView.findViewById(R.id.likes)
             publisher = itemView.findViewById(R.id.publisher)
             description = itemView.findViewById(R.id.description)
-            comments = itemView.findViewById(R.id.post_image_comment_btn)
+            comments = itemView.findViewById(R.id.comments)
         }
 
     }

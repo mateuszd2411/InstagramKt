@@ -9,11 +9,11 @@ class Post {
 
     constructor()
 
-    constructor(postid: String, postimage: String, publisher: String, descriprion: String) {
+    constructor(postid: String, postimage: String, publisher: String, description: String) {
         this.postid = postid
         this.postimage = postimage
         this.publisher = publisher
-        this.descriprion = descriprion
+        this.descriprion = description
     }
 
     fun getPostid(): String {
