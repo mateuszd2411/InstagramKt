@@ -48,6 +48,7 @@ class CommentActivity : AppCompatActivity() {
         recyclerView.adapter = commentAdapter
 
         userInfo()
+        readComments()
 
         post_comment.setOnClickListener(View.OnClickListener {
             if (add_comment!!.text.toString() == "") {
@@ -92,6 +93,32 @@ class CommentActivity : AppCompatActivity() {
                         .into(profile_image_comment)
                 }
 
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+        })
+    }
+
+    private fun readComments() {
+        val commentsRef = FirebaseDatabase.getInstance()
+            .reference.child("CommentsKt")
+            .child(postId)
+
+        commentsRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(p0: DataSnapshot) {
+
+                if (p0.exists()) {
+                    commentList!!.clear()
+
+                    for (snapshot in p0.children) {
+                        val comment = snapshot.getValue(Comment::class.java)
+                        commentList!!.add(comment!!)
+                    }
+                    commentAdapter!!.notifyDataSetChanged()
+                }
             }
 
             override fun onCancelled(p0: DatabaseError) {
