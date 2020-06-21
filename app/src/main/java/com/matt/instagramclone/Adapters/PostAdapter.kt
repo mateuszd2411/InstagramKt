@@ -1,6 +1,7 @@
 package com.matt.instagramclone.Adapters
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.matt.instagramclone.MainActivity
 import com.matt.instagramclone.Models.Post
 import com.matt.instagramclone.Models.User
 import com.matt.instagramclone.R
@@ -45,6 +47,52 @@ class PostAdapter
         Picasso.get().load(post.getPostimage()).into(holder.postImage)
 
         publisherInfo(holder.profileImage, holder.userName, holder.publisher, post.getPublisher())
+        isLikes(post.getPostid(), holder.likeButton)
+
+        holder.likeButton.setOnClickListener {
+            if (holder.likeButton.tag == "Like") {
+                FirebaseDatabase.getInstance().reference
+                    .child("LikesKt")
+                    .child(post.getPostid())
+                    .child(firebaseUser!!.uid)
+                    .setValue(true)
+            } else {
+                FirebaseDatabase.getInstance().reference
+                    .child("LikesKt")
+                    .child(post.getPostid())
+                    .child(firebaseUser!!.uid)
+                    .removeValue()
+
+                val intent = Intent(mContext, MainActivity::class.java)
+                mContext.startActivity(intent)
+
+            }
+        }
+    }
+
+    private fun isLikes(postid: String, likeButton: ImageView) {
+
+        val firebaseUser = FirebaseAuth.getInstance().currentUser
+
+        val LikesRef = FirebaseDatabase.getInstance().reference
+            .child("LikesKt").child(postid)
+
+        LikesRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(p0: DataSnapshot) {
+                if (p0.child(firebaseUser!!.uid).exists()) {
+                    likeButton.setImageResource(R.drawable.heart_clicked)
+                    likeButton.tag = "Liked"
+                } else {
+                    likeButton.setImageResource(R.drawable.heart_not_clicked)
+                    likeButton.tag = "Like"
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+        })
     }
 
     inner class ViewHolder(@NonNull itemView: View) : RecyclerView.ViewHolder(itemView) {
