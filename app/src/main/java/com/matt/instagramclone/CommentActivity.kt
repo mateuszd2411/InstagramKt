@@ -4,12 +4,16 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.matt.instagramclone.Adapters.CommentsAdapter
+import com.matt.instagramclone.Models.Comment
 import com.matt.instagramclone.Models.User
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_account_settings.*
@@ -20,6 +24,8 @@ class CommentActivity : AppCompatActivity() {
     private var postId = ""
     private var publisherId = ""
     private var firebaseUser: FirebaseUser? = null
+    private var commentAdapter: CommentsAdapter? = null
+    private var commentList: MutableList<Comment>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +36,16 @@ class CommentActivity : AppCompatActivity() {
         publisherId = intent.getStringExtra("publisherId")
 
         firebaseUser = FirebaseAuth.getInstance().currentUser
+
+        var recyclerView: RecyclerView
+        recyclerView = findViewById(R.id.recycler_view_comments)
+        val linearLayoutManager = LinearLayoutManager(this)
+        linearLayoutManager.reverseLayout = true
+        recyclerView.layoutManager = linearLayoutManager
+
+        commentList = ArrayList()
+        commentAdapter = CommentsAdapter(this, commentList)
+        recyclerView.adapter = commentAdapter
 
         userInfo()
 
