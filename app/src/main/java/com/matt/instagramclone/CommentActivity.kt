@@ -49,6 +49,7 @@ class CommentActivity : AppCompatActivity() {
 
         userInfo()
         readComments()
+        getPostImage()
 
         post_comment.setOnClickListener(View.OnClickListener {
             if (add_comment!!.text.toString() == "") {
@@ -91,6 +92,31 @@ class CommentActivity : AppCompatActivity() {
 
                     Picasso.get().load(user!!.getImage()).placeholder(R.drawable.profile)
                         .into(profile_image_comment)
+                }
+
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+        })
+    }
+
+    private fun getPostImage() {
+        val postsRef =
+            FirebaseDatabase.getInstance()
+                .reference.child("PostsKt")
+                .child(postId!!).child("postimage")
+
+        postsRef.addValueEventListener(object : ValueEventListener {
+
+            override fun onDataChange(p0: DataSnapshot) {
+                if (p0.exists()) {
+                    val image = p0.value.toString()
+
+                    Picasso.get().load(image).placeholder(R.drawable.profile)
+                        .into(post_image_comment)
                 }
 
             }
