@@ -2,6 +2,8 @@ package com.matt.instagramclone
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
@@ -30,6 +32,34 @@ class CommentActivity : AppCompatActivity() {
         firebaseUser = FirebaseAuth.getInstance().currentUser
 
         userInfo()
+
+        post_comment.setOnClickListener(View.OnClickListener {
+            if (add_comment!!.text.toString() == "") {
+                Toast.makeText(
+                    this@CommentActivity,
+                    "Please write comment first...",
+                    Toast.LENGTH_LONG
+                ).show()
+            } else {
+                addComment()
+            }
+        })
+
+    }
+
+    private fun addComment() {
+        val commentsRef =
+            FirebaseDatabase.getInstance().reference
+                .child("CommentsKt")
+                .child(postId!!)
+
+        val commentsMap = HashMap<String, Any>()
+        commentsMap["comment"] = add_comment!!.text.toString()
+        commentsMap["publisher"] = firebaseUser!!.uid
+
+        commentsRef.push().setValue(commentsMap)
+
+        add_comment!!.text.clear()
     }
 
     private fun userInfo() {
