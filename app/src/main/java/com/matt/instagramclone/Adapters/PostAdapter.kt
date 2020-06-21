@@ -10,10 +10,16 @@ import androidx.annotation.NonNull
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.matt.instagramclone.Models.Post
+import com.matt.instagramclone.Models.User
 import com.matt.instagramclone.R
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.android.synthetic.main.activity_account_settings.*
 
 class PostAdapter
     (private val mContext: Context,
@@ -38,6 +44,7 @@ class PostAdapter
 
         Picasso.get().load(post.getPostimage()).into(holder.postImage)
 
+        publisherInfo(holder.profileImage, holder.userName, holder.publisher, post.getPublisher())
     }
 
     inner class ViewHolder(@NonNull itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -65,5 +72,35 @@ class PostAdapter
         }
 
     }
+
+    private fun publisherInfo(
+        profileImage: CircleImageView,
+        userName: TextView,
+        publisher: TextView,
+        publisherID: String
+    ) {
+        val usersRef = FirebaseDatabase.getInstance().reference.child("UsersKt").child(publisherID)
+
+        usersRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(p0: DataSnapshot) {
+
+                if (p0.exists()) {
+                    val user = p0.getValue<User>(User::class.java)
+                    Picasso.get().load(user!!.getImage()).placeholder(R.drawable.profile)
+                        .into(profileImage)
+                    userName.text = user!!.getUsername()
+                    publisher.text = user!!.getFullname()
+                }
+
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+        })
+    }
+
+
 
 }
