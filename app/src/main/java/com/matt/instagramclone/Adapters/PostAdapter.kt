@@ -58,6 +58,7 @@ class PostAdapter
         isLikes(post.getPostid(), holder.likeButton)
         numberOfLikes(holder.likes, post.getPostid())
         getTotalComments(holder.comments, post.getPostid())
+        checkSavedStatus(post.getPostid(), holder.saveButton)
 
         holder.likeButton.setOnClickListener {
             if (holder.likeButton.tag == "Like") {
@@ -91,6 +92,22 @@ class PostAdapter
             intentComment.putExtra("postId", post.getPostid())
             intentComment.putExtra("publisherId", post.getPublisher())
             mContext.startActivity(intentComment)
+        }
+
+        holder.saveButton.setOnClickListener {
+            if (holder.saveButton.tag == "Save") {
+                FirebaseDatabase.getInstance().reference
+                    .child("SavesKt")
+                    .child(firebaseUser!!.uid)
+                    .child(post.getPostid())
+                    .setValue(true)
+            } else {
+                FirebaseDatabase.getInstance().reference
+                    .child("SavesKt")
+                    .child(firebaseUser!!.uid)
+                    .child(post.getPostid())
+                    .removeValue()
+            }
         }
     }
 
@@ -213,6 +230,28 @@ class PostAdapter
         })
     }
 
+    private fun checkSavedStatus(postid: String, imageView: ImageView) {
+        val saveRef = FirebaseDatabase.getInstance().reference
+            .child("SavesKt")
+            .child(firebaseUser!!.uid)
+
+        saveRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(p0: DataSnapshot) {
+                if (p0.child(postid).exists()) {
+                    imageView.setImageResource(R.drawable.save_large_icon)
+                    imageView.tag = "Saved"
+                } else {
+                    imageView.setImageResource(R.drawable.save_unfilled_large_icon)
+                    imageView.tag = "Save"
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+        })
+    }
 
 
 }
