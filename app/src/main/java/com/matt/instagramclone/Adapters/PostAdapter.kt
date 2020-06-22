@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.NonNull
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -20,6 +21,7 @@ import com.matt.instagramclone.MainActivity
 import com.matt.instagramclone.Models.Post
 import com.matt.instagramclone.Models.User
 import com.matt.instagramclone.R
+import com.matt.instagramclone.ShowUsersActivity
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.activity_account_settings.*
@@ -78,6 +80,13 @@ class PostAdapter
                 mContext.startActivity(intent)
 
             }
+        }
+
+        holder.likes.setOnClickListener {
+            val intent = Intent(mContext, ShowUsersActivity::class.java)
+            intent.putExtra("id", post.getPostid())
+            intent.putExtra("title", "likes")
+            mContext.startActivity(intent)
         }
 
         holder.commentButton.setOnClickListener {

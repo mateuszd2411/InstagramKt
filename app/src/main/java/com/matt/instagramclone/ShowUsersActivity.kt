@@ -12,6 +12,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.matt.instagramclone.Adapters.UserAdapter
 import com.matt.instagramclone.Models.User
+import kotlinx.android.synthetic.main.fragment_profile.view.*
+import kotlinx.android.synthetic.main.fragment_search.view.*
 
 class ShowUsersActivity : AppCompatActivity() {
 
@@ -62,13 +64,50 @@ class ShowUsersActivity : AppCompatActivity() {
     }
 
     private fun getFollowers() {
+        val followersRef = FirebaseDatabase.getInstance().reference
+            .child("FollowKt").child(id!!)
+            .child("Followers")
 
+
+        followersRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(p0: DataSnapshot) {
+                (idList as ArrayList<String>).clear()
+
+                for (snapshot in p0.children) {
+                    (idList as ArrayList<String>).add(snapshot.key!!)
+                }
+                showUsers()
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+        })
 
     }
 
     private fun getFollowing() {
 
+        val followersRef = FirebaseDatabase.getInstance().reference
+            .child("FollowKt").child(id!!)
+            .child("Following")
 
+        followersRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(p0: DataSnapshot) {
+                (idList as ArrayList<String>).clear()
+
+                for (snapshot in p0.children) {
+                    (idList as ArrayList<String>).add(snapshot.key!!)
+                }
+                showUsers()
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+        })
     }
 
     private fun getLikes() {
@@ -86,6 +125,7 @@ class ShowUsersActivity : AppCompatActivity() {
                     for (snapshot in p0.children) {
                         (idList as ArrayList<String>).add(snapshot.key!!)
                     }
+                    showUsers()
                 }
             }
 
@@ -93,6 +133,36 @@ class ShowUsersActivity : AppCompatActivity() {
 
             }
 
+        })
+    }
+
+    private fun showUsers() {
+
+        val usersRef = FirebaseDatabase.getInstance().getReference().child("UsersKt")
+        usersRef.addValueEventListener(object : ValueEventListener {
+
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+
+                    (userList as ArrayList<User>).clear()
+
+                for (snapshot in dataSnapshot.children) {
+
+                    val user = snapshot.getValue(User::class.java)
+
+                    for (id in idList!!) {
+                        if (user!!.getUid() == id) {
+                            (userList as ArrayList<User>).add(user!!)
+                        }
+                    }
+                }
+
+                    userAdapter?.notifyDataSetChanged()
+
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
         })
     }
 }
