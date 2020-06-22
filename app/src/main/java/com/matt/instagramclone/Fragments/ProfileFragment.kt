@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -80,11 +81,28 @@ class ProfileFragment : Fragment() {
         recyclerViewSavedImages = view.findViewById(R.id.recycler_view_saved_pic)
         recyclerViewSavedImages.setHasFixedSize(true)
         val linearLayoutManager2: LinearLayoutManager = GridLayoutManager(context,3)
-        recyclerViewUploadImages.layoutManager = linearLayoutManager2
+        recyclerViewSavedImages.layoutManager = linearLayoutManager2
 
         postListSaved = ArrayList()
         myImagesAdapterSavedImg = context?.let { MyImagesAdapter(it, postListSaved as ArrayList<Post>) }
-        recyclerViewSavedImages.adapter = myImagesAdapter
+        recyclerViewSavedImages.adapter = myImagesAdapterSavedImg
+
+        recyclerViewSavedImages.visibility = View.GONE
+        recyclerViewUploadImages.visibility = View.VISIBLE
+
+        var uploadedImageBtn: ImageButton
+        uploadedImageBtn = view.findViewById(R.id.images_grid_view_btn)
+        uploadedImageBtn.setOnClickListener {
+            recyclerViewSavedImages.visibility = View.GONE
+            recyclerViewUploadImages.visibility = View.VISIBLE
+        }
+
+        var savedImageBtn: ImageButton
+        savedImageBtn = view.findViewById(R.id.images_save_btn)
+        savedImageBtn.setOnClickListener {
+            recyclerViewSavedImages.visibility = View.VISIBLE
+            recyclerViewUploadImages.visibility = View.GONE
+        }
 
         view.edit_account_settings_btn.setOnClickListener {
 
