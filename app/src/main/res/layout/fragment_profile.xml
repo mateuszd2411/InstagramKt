@@ -49,20 +49,20 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <ScrollView
+    <RelativeLayout
         android:id="@+id/scroll_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_below="@+id/app_bar_layout_profile_frag">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
             <LinearLayout
                 android:id="@+id/top_bar"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="16dp">
@@ -74,7 +74,7 @@
                     android:src="@drawable/profile"/>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="5dp"
@@ -82,7 +82,7 @@
                     android:orientation="vertical">
 
                     <LinearLayout
-                        android:layout_width="190dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:orientation="horizontal">
@@ -169,6 +169,7 @@
                         android:layout_height="32dp"
                         android:text="Edit Profile"
                         android:textAllCaps="false"
+                        android:textAlignment="center"
                         android:layout_marginTop="2dp"
                         android:layout_marginLeft="10dp"
                         android:background="@drawable/buttons_background" />
@@ -231,8 +232,19 @@
 
             </LinearLayout>
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view_upload_pic"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view_saved_pic"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
+
         </LinearLayout>
 
-    </ScrollView>
+    </RelativeLayout>
 
 </RelativeLayout>
