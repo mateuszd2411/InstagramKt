@@ -18,6 +18,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.matt.instagramclone.AccountSettingsActivity
+import com.matt.instagramclone.Adapters.MyImagesAdapter
 import com.matt.instagramclone.Models.Post
 import com.matt.instagramclone.Models.User
 
@@ -35,6 +36,7 @@ class ProfileFragment : Fragment() {
     private lateinit var firebaseUser: FirebaseUser
 
     var postList: List<Post>? = null
+    var myImagesAdapter: MyImagesAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,6 +64,10 @@ class ProfileFragment : Fragment() {
         recyclerViewUploadImages.setHasFixedSize(true)
         val linearLayoutManager: LinearLayoutManager = GridLayoutManager(context,3)
         recyclerViewUploadImages.layoutManager = linearLayoutManager
+
+        postList = ArrayList()
+        myImagesAdapter = context?.let { MyImagesAdapter(it, postList as ArrayList<Post>) }
+        recyclerViewUploadImages.adapter = myImagesAdapter
 
         view.edit_account_settings_btn.setOnClickListener {
 
@@ -116,6 +122,7 @@ class ProfileFragment : Fragment() {
         getFollowers()
         getFollowings()
         userInfo()
+        myPhotos()
 
         return view
     }
@@ -201,6 +208,7 @@ class ProfileFragment : Fragment() {
                                 (postList as ArrayList<Post>).add(post)
                             }
                             Collections.reverse(postList)
+                            myImagesAdapter!!.notifyDataSetChanged()
                         }
                     }
                 }
