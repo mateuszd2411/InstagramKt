@@ -1,6 +1,7 @@
 package com.matt.instagramclone.Adapters
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.matt.instagramclone.Fragments.ProfileFragment
+import com.matt.instagramclone.MainActivity
 import com.matt.instagramclone.Models.User
 import com.matt.instagramclone.R
 import com.squareup.picasso.Picasso
@@ -45,12 +47,18 @@ class UserAdapter (private var mContext: Context,
         checkFollowingStatus(user.getUid(), holder.followButton)
 
         holder.itemView.setOnClickListener(View.OnClickListener {
-            val pref = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit()
-            pref.putString("profileId", user.getUid())
-            pref.apply()
+            if (isFragment) {
+                val pref = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit()
+                pref.putString("profileId", user.getUid())
+                pref.apply()
 
-            (mContext as FragmentActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, ProfileFragment()).commit()
+                (mContext as FragmentActivity).supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, ProfileFragment()).commit()
+            } else {
+                val intent = Intent(mContext, MainActivity::class.java)
+                intent.putExtra("publisherId", user.getUid())
+                mContext.startActivity(intent)
+            }
         })
 
         holder.followButton.setOnClickListener {

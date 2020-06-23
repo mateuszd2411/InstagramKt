@@ -78,7 +78,7 @@ class NotificationAdapter(
             } else {
                 val editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit()
 
-                editor.putString("profileId", notification.getPostId())
+                editor.putString("profileId", notification.getUserId())
 
                 editor.apply()
 
@@ -133,7 +133,7 @@ class NotificationAdapter(
         val postsRef =
             FirebaseDatabase.getInstance()
                 .reference.child("PostsKt")
-                .child(postId).child("postimage")
+                .child(postId)
 
         postsRef.addValueEventListener(object : ValueEventListener {
 
