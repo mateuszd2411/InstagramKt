@@ -7,11 +7,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.NonNull
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.matt.instagramclone.Fragments.PostDetailsFragment
+import com.matt.instagramclone.Fragments.ProfileFragment
 import com.matt.instagramclone.Models.Notifications
 import com.matt.instagramclone.Models.Post
 import com.matt.instagramclone.Models.User
@@ -58,6 +61,31 @@ class NotificationAdapter(
             getPostImage(holder.postImage, notification.getPostId())
         } else {
             holder.postImage.visibility = View.GONE
+        }
+
+        holder.itemView.setOnClickListener {
+            if (notification.isIsPost()) {
+
+                val editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit()
+
+                editor.putString("postId", notification.getPostId())
+
+                editor.apply()
+
+                (mContext as FragmentActivity).supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, PostDetailsFragment()).commit()
+            } else {
+                val editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit()
+
+                editor.putString("profileId", notification.getPostId())
+
+                editor.apply()
+
+                (mContext as FragmentActivity).supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, ProfileFragment()).commit()
+            }
         }
     }
 
