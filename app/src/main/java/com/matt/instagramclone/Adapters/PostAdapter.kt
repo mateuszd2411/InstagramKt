@@ -25,6 +25,7 @@ import com.matt.instagramclone.ShowUsersActivity
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.activity_account_settings.*
+import kotlinx.android.synthetic.main.activity_comment.*
 
 class PostAdapter
     (private val mContext: Context,
@@ -69,6 +70,8 @@ class PostAdapter
                     .child(post.getPostid())
                     .child(firebaseUser!!.uid)
                     .setValue(true)
+
+                addNotification(post.getPublisher(), post.getPostid())
             } else {
                 FirebaseDatabase.getInstance().reference
                     .child("LikesKt")
@@ -262,5 +265,19 @@ class PostAdapter
         })
     }
 
+    private fun addNotification(userId: String, postId: String) {
+
+        val notiRef = FirebaseDatabase.getInstance()
+            .reference.child("NotificationsKt")
+            .child(userId)
+
+        val notiMap = HashMap<String, Any>()
+        notiMap["userid"] = firebaseUser!!.uid
+        notiMap["text"] = "like your post"
+        notiMap["postid"] = postId
+        notiMap["ispost"] = true
+
+        notiRef.push().setValue(notiMap)
+    }
 
 }

@@ -76,6 +76,7 @@ class UserAdapter (private var mContext: Context,
                             }
                         }
                 }
+                addNotification(user.getUid())
             }
             else {
                 firebaseUser?.uid.let { it1 ->
@@ -131,5 +132,20 @@ class UserAdapter (private var mContext: Context,
 
             }
         })
+    }
+
+    private fun addNotification(userId: String) {
+
+        val notiRef = FirebaseDatabase.getInstance()
+            .reference.child("NotificationsKt")
+            .child(userId)
+
+        val notiMap = HashMap<String, Any>()
+        notiMap["userid"] = firebaseUser!!.uid
+        notiMap["text"] = "started following you"
+        notiMap["postid"] = ""
+        notiMap["ispost"] = false
+
+        notiRef.push().setValue(notiMap)
     }
 }
