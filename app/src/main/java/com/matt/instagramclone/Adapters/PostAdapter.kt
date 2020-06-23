@@ -273,7 +273,7 @@ class PostAdapter
 
         val notiMap = HashMap<String, Any>()
         notiMap["userid"] = firebaseUser!!.uid
-        notiMap["text"] = "like your post"
+        notiMap["text"] = "liked your post"
         notiMap["postid"] = postId
         notiMap["ispost"] = true
 

@@ -25,7 +25,7 @@ class Notifications {
     fun getPostId(): String {
         return postid
     }
-    fun getIsPost(): Boolean {
+    fun isIsPost(): Boolean {
         return ispost
     }
 
