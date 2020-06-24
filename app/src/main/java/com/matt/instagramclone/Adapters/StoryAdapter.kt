@@ -31,7 +31,7 @@ RecyclerView.Adapter<StoryAdapter.ViewHolder>(){
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val story = mStory[position]
     }
 
 

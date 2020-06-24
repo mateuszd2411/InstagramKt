@@ -16,6 +16,7 @@ import com.google.firebase.database.ValueEventListener
 import com.matt.instagramclone.Adapters.PostAdapter
 import com.matt.instagramclone.Adapters.StoryAdapter
 import com.matt.instagramclone.Models.Post
+import com.matt.instagramclone.Models.Story
 
 import com.matt.instagramclone.R
 
@@ -26,9 +27,10 @@ class HomeFragment : Fragment() {
 
     private var postAdapter: PostAdapter? = null
     private var postList: MutableList<Post>? = null
-    private var followingList: MutableList<Post>? = null
+    private var followingList: MutableList<String>? = null
 
     private var storyAdapter: StoryAdapter? = null
+    private var storyList: List<Story>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,6 +46,7 @@ class HomeFragment : Fragment() {
         linearLayoutManager.stackFromEnd = true
         recyclerView.layoutManager = linearLayoutManager
 
+        //Story
         var recyclerViewStory: RecyclerView? = null
         recyclerViewStory = view.findViewById(R.id.recycler_view_story)
         val linearLayoutManager2 = LinearLayoutManager(context)
@@ -56,6 +59,11 @@ class HomeFragment : Fragment() {
         postList = ArrayList()
         postAdapter = context?.let { PostAdapter(it, postList as ArrayList<Post>) }
         recyclerView.adapter = postAdapter
+
+        //Story
+        storyList = ArrayList()
+        storyAdapter = context?.let { StoryAdapter(it, storyList as ArrayList<Story>) }
+        recyclerViewStory.adapter = storyAdapter
 
         checkFollowings()
 
@@ -79,6 +87,7 @@ class HomeFragment : Fragment() {
                     }
 
                     retrievePosts()
+                    retrieveStories()
                 }
             }
 
@@ -117,5 +126,43 @@ class HomeFragment : Fragment() {
         })
     }
 
+    private fun retrieveStories() {
+        val storyRef = FirebaseDatabase.getInstance().reference.child("StoryKt")
+
+        storyRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val timeCurrent = System.currentTimeMillis()
+
+                (storyList as ArrayList<Story>).clear()
+
+                (storyList as ArrayList<Story>).add(Story("", 0,0,"",FirebaseAuth.getInstance().currentUser!!.uid))
+
+                for (id in followingList!!) {
+                    var countStory = 0
+
+                    var story: Story? = null
+
+                    for (snapshot in dataSnapshot.child(id).children) {
+                        story = snapshot.getValue(Story::class.java)
+
+                        if (timeCurrent > story!!.getTimeStart() && timeCurrent < story!!.getTimeEnd()) {
+                            countStory++
+                        }
+                    }
+                    if (countStory > 0) {
+                        (storyList as ArrayList<Story>).add(story!!)
+                    }
+                }
+                storyAdapter!!.notifyDataSetChanged()
+
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+        })
+
+    }
 
 }
