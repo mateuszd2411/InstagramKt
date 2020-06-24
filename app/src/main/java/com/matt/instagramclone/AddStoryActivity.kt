@@ -100,7 +100,7 @@ class AddStoryActivity : AppCompatActivity() {
 
                         Toast.makeText(
                             this,
-                            "Post has been updated successfully...",
+                            "Story has been updated successfully...",
                             Toast.LENGTH_LONG
                         ).show()
 
