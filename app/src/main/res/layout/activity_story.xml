@@ -36,7 +36,7 @@
     </LinearLayout>
 
     <jp.shts.android.storiesprogressview.StoriesProgressView
-        android:id="@+id/stories_pages"
+        android:id="@+id/stories_progress"
         android:layout_width="match_parent"
         android:layout_height="10dp"
         android:layout_marginStart="8dp"
