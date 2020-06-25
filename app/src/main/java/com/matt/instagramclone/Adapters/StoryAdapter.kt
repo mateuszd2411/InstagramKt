@@ -25,8 +25,8 @@ import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.fragment_profile.view.*
 
-class StoryAdapter (private val mContext: Context, private val mStory: List<Story>) :
-RecyclerView.Adapter<StoryAdapter.ViewHolder>(){
+class StoryAdapter(private val mContext: Context, private val mStory: List<Story>) :
+    RecyclerView.Adapter<StoryAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return if (viewType == 0) {
             val view = LayoutInflater.from(mContext).inflate(R.layout.add_story_item, parent, false)
@@ -48,10 +48,21 @@ RecyclerView.Adapter<StoryAdapter.ViewHolder>(){
 
         userInfo(holder, story.getUserId(), position)
 
+        if (holder.adapterPosition !== 0) {
+            seenStory(holder, story.getUserId())
+        }
+        if (holder.adapterPosition === 0) {
+            myStories(holder.addStory_text!!, holder.story_plus_btn!!, false)
+        }
+
         holder.itemView.setOnClickListener {
-            val intent = Intent(mContext, AddStoryActivity::class.java)
-            intent.putExtra("userid", story.getUserId())
-            mContext.startActivity(intent)
+            if (holder.adapterPosition === 0) {
+                myStories(holder.addStory_text!!, holder.story_plus_btn!!, true)
+            } else {
+                val intent = Intent(mContext, StoryActivity::class.java)
+                intent.putExtra("userid", story.getUserId())
+                mContext.startActivity(intent)
+            }
         }
     }
 
@@ -92,7 +103,7 @@ RecyclerView.Adapter<StoryAdapter.ViewHolder>(){
         val usersRef =
             FirebaseDatabase.getInstance().getReference().child("UsersKt").child(userId)
 
-        usersRef.addValueEventListener(object : ValueEventListener {
+        usersRef.addListenerForSingleValueEvent(object : ValueEventListener {
 
             override fun onDataChange(p0: DataSnapshot) {
                 if (p0.exists()) {
@@ -122,7 +133,7 @@ RecyclerView.Adapter<StoryAdapter.ViewHolder>(){
         val storyRef = FirebaseDatabase.getInstance().reference
             .child("StoryKt").child(FirebaseAuth.getInstance().currentUser!!.uid)
 
-        storyRef.addValueEventListener(object : ValueEventListener {
+        storyRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
 
                 var counter = 0
@@ -142,37 +153,40 @@ RecyclerView.Adapter<StoryAdapter.ViewHolder>(){
                         val alertDialog = AlertDialog.Builder(mContext).create()
 
                         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "View Story")
-                        {
-                                dialogInterface, which ->
+                        { dialogInterface, which ->
 
                             val intent = Intent(mContext, StoryActivity::class.java)
                             intent.putExtra("userid", FirebaseAuth.getInstance().currentUser!!.uid)
                             mContext.startActivity(intent)
-                            alertDialog.dismiss()
+                            dialogInterface.dismiss()
                         }
 
                         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Add Story")
-                        {
-                                dialogInterface, which ->
+                        { dialogInterface, which ->
 
                             val intent = Intent(mContext, AddStoryActivity::class.java)
                             intent.putExtra("userid", FirebaseAuth.getInstance().currentUser!!.uid)
                             mContext.startActivity(intent)
-                            alertDialog.dismiss()
+                            dialogInterface.dismiss()
                         }
                         alertDialog.show()
                     } else {
-                        if (counter > 0) {
-                            textView.text = "My Story"
-                            imageView.visibility = View.GONE
-                        } else {
-                            textView.text = "Add Story"
-                            imageView.visibility = View.VISIBLE
-                        }
+                        val intent = Intent(mContext, AddStoryActivity::class.java)
+                        intent.putExtra("userid", FirebaseAuth.getInstance().currentUser!!.uid)
+                        mContext.startActivity(intent)
                     }
-
+                } else {
+                    if (counter > 0) {
+                        textView.text = "My Story"
+                        imageView.visibility = View.GONE
+                    } else {
+                        textView.text = "Add Story"
+                        imageView.visibility = View.VISIBLE
+                    }
                 }
+
             }
+
 
             override fun onCancelled(p0: DatabaseError) {
 
@@ -186,15 +200,16 @@ RecyclerView.Adapter<StoryAdapter.ViewHolder>(){
         val storyRef = FirebaseDatabase.getInstance().reference
             .child("StoryKt").child(userId)
 
-        storyRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        storyRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
                 var i = 0
                 for (snapshot in p0.children) {
                     if (!snapshot.child("views")
                             .child(FirebaseAuth.getInstance().currentUser!!.uid).exists()
-                        && System.currentTimeMillis() < snapshot.getValue(Story::class.java)!!.getTimeEnd()
+                        && System.currentTimeMillis() < snapshot.getValue(Story::class.java)!!
+                            .getTimeEnd()
                     ) {
-                        i = i + 1
+                        i++
                     }
                 }
                 if (i > 0) {
