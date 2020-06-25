@@ -1,7 +1,11 @@
 package com.matt.instagramclone
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MotionEvent
+import android.view.View
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -18,11 +22,31 @@ class StoryActivity : AppCompatActivity(), StoriesProgressView.StoriesListener {
     var currentUserId: String = ""
     var userId: String = ""
     var counter = 0
+    var pressTime = 0L
+    var limit = 500L
 
     var imagesList: List<String>? = null
     var storyIdsList: List<String>? = null
 
     var storiesProgressView: StoriesProgressView? = null
+
+    private val onTouchListener = View.OnTouchListener { view, motionEvent ->
+
+        when (motionEvent.action) {
+            MotionEvent.ACTION_DOWN -> {
+                pressTime = System.currentTimeMillis()
+                storiesProgressView!!.pause()
+                return@OnTouchListener false
+            }
+            MotionEvent.ACTION_UP -> {
+                val now = System.currentTimeMillis()
+                storiesProgressView!!.resume()
+                return@OnTouchListener limit < now - pressTime
+            }
+        }
+
+        false
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +56,47 @@ class StoryActivity : AppCompatActivity(), StoriesProgressView.StoriesListener {
         userId = intent.getStringExtra("userId")
 
         storiesProgressView = findViewById(R.id.stories_progress)
+
+        layout_seen.visibility = View.GONE
+        story_delete.visibility = View.GONE
+
+        if (userId == currentUserId) {
+            layout_seen.visibility = View.VISIBLE
+            story_delete.visibility = View.VISIBLE
+        }
+
+        getStories(userId!!)
+        userInfo(userId!!)
+
+        val reverse: View = findViewById(R.id.reverse)
+        reverse.setOnClickListener { storiesProgressView!!.reverse() }
+        reverse.setOnTouchListener(onTouchListener)
+
+        val skip: View = findViewById(R.id.skip)
+        skip.setOnClickListener { storiesProgressView!!.skip() }
+        skip.setOnTouchListener(onTouchListener)
+
+        seen_number.setOnClickListener {
+            val intent = Intent(this@StoryActivity, ShowUsersActivity::class.java)
+            intent.putExtra("id", userId)
+            intent.putExtra("storyid", storyIdsList!![counter])
+            intent.putExtra("title", "views")
+            startActivity(intent)
+
+        }
+
+        story_delete.setOnClickListener {
+            val ref = FirebaseDatabase.getInstance().reference
+                .child("StoryKt")
+                .child(userId!!)
+                .child(storyIdsList!![counter])
+
+            ref.removeValue().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(this@StoryActivity, "Deleted...", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
     private fun getStories(userId: String) {
@@ -130,14 +195,35 @@ class StoryActivity : AppCompatActivity(), StoriesProgressView.StoriesListener {
     }
 
     override fun onComplete() {
-        TODO("Not yet implemented")
+        finish()
     }
 
     override fun onPrev() {
-        TODO("Not yet implemented")
+        Picasso.get().load(imagesList!![--counter]).placeholder(R.drawable.profile)
+            .into(image_story)
+        seenNumber(storyIdsList!![counter])
     }
 
     override fun onNext() {
-        TODO("Not yet implemented")
+        Picasso.get().load(imagesList!![++counter]).placeholder(R.drawable.profile)
+            .into(image_story)
+
+        addViewToStory(storyIdsList!![counter])
+        seenNumber(storyIdsList!![counter])
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        storiesProgressView!!.destroy()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        storiesProgressView!!.resume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        storiesProgressView!!.pause()
     }
 }

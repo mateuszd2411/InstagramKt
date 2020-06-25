@@ -59,7 +59,27 @@ class ShowUsersActivity : AppCompatActivity() {
     }
 
     private fun getViews() {
+        val ref = FirebaseDatabase.getInstance().reference
+            .child("StoryKt")
+            .child(id!!)
+            .child(intent.getStringExtra("storyid"))
+            .child("views")
 
+        ref.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(p0: DataSnapshot) {
+                (idList as ArrayList<String>).clear()
+
+                for (snapshot in p0.children) {
+                    (idList as ArrayList<String>).add(snapshot.key!!)
+                }
+                showUsers()
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+        })
 
     }
 

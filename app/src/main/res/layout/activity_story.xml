@@ -79,7 +79,8 @@
         android:layout_alignParentBottom="true"
         android:background="#20000000"
         android:padding="4dp"
-        android:layout_margin="10dp">
+        android:layout_margin="10dp"
+        android:visibility="gone">
 
         <TextView
             android:layout_width="wrap_content"
@@ -115,6 +116,7 @@
         android:layout_alignParentEnd="true"
         android:textColor="@android:color/white"
         android:background="#20000000"
-        android:gravity="center" />
+        android:gravity="center"
+        android:visibility="gone"/>
 
 </RelativeLayout>
