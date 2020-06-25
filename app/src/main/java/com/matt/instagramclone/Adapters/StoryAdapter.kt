@@ -1,5 +1,6 @@
 package com.matt.instagramclone.Adapters
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.NonNull
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -18,6 +20,7 @@ import com.matt.instagramclone.MainActivity
 import com.matt.instagramclone.Models.Story
 import com.matt.instagramclone.Models.User
 import com.matt.instagramclone.R
+import com.matt.instagramclone.StoryActivity
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.fragment_profile.view.*
@@ -106,6 +109,101 @@ RecyclerView.Adapter<StoryAdapter.ViewHolder>(){
                     }
                 }
 
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+        })
+    }
+
+    private fun myStories(textView: TextView, imageView: ImageView, click: Boolean) {
+        val storyRef = FirebaseDatabase.getInstance().reference
+            .child("StoryKt").child(FirebaseAuth.getInstance().currentUser!!.uid)
+
+        storyRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(p0: DataSnapshot) {
+
+                var counter = 0
+
+                val timeCurrent = System.currentTimeMillis()
+
+                for (snapshot in p0.children) {
+                    val story = snapshot.getValue(Story::class.java)
+
+                    if (timeCurrent > story!!.getTimeStart() && timeCurrent < story!!.getTimeEnd()) {
+                        counter++
+                    }
+                }
+
+                if (click) {
+                    if (counter > 0) {
+                        val alertDialog = AlertDialog.Builder(mContext).create()
+
+                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "View Story")
+                        {
+                                dialogInterface, which ->
+
+                            val intent = Intent(mContext, StoryActivity::class.java)
+                            intent.putExtra("userid", FirebaseAuth.getInstance().currentUser!!.uid)
+                            mContext.startActivity(intent)
+                            alertDialog.dismiss()
+                        }
+
+                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Add Story")
+                        {
+                                dialogInterface, which ->
+
+                            val intent = Intent(mContext, AddStoryActivity::class.java)
+                            intent.putExtra("userid", FirebaseAuth.getInstance().currentUser!!.uid)
+                            mContext.startActivity(intent)
+                            alertDialog.dismiss()
+                        }
+                        alertDialog.show()
+                    } else {
+                        if (counter > 0) {
+                            textView.text = "My Story"
+                            imageView.visibility = View.GONE
+                        } else {
+                            textView.text = "Add Story"
+                            imageView.visibility = View.VISIBLE
+                        }
+                    }
+
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+        })
+
+    }
+
+    private fun seenStory(viewHolder: ViewHolder, userId: String) {
+        val storyRef = FirebaseDatabase.getInstance().reference
+            .child("StoryKt").child(userId)
+
+        storyRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(p0: DataSnapshot) {
+                var i = 0
+                for (snapshot in p0.children) {
+                    if (!snapshot.child("views")
+                            .child(FirebaseAuth.getInstance().currentUser!!.uid).exists()
+                        && System.currentTimeMillis() < snapshot.getValue(Story::class.java)!!.getTimeEnd()
+                    ) {
+                        i = i + 1
+                    }
+                }
+                if (i > 0) {
+                    viewHolder.story_image!!.visibility = View.VISIBLE
+                    viewHolder.story_image_seen!!.visibility = View.GONE
+                } else {
+                    viewHolder.story_image!!.visibility = View.GONE
+                    viewHolder.story_image_seen!!.visibility = View.VISIBLE
+                }
             }
 
             override fun onCancelled(p0: DatabaseError) {
